@@ -1,10 +1,12 @@
 Installation from source:
 
-* To use this procedure, you'll need a c compiler (such as gcc) and GNU make. 
+* To use this procedure, you'll need GNU autoconf, a c compiler (such as gcc), and GNU make.
+* On Ubuntu 24.04 use "sudo apt install autoconf" to install the autoconf package and 
+  "autoreconf -fiv" to generate the configure script.
 
 There are mainly two different installation types for this caster:
 
-- Run "./configure --enable-fsstd" if you want standard installation. The path
+- Run "autoreconf -fiv && ./configure --enable-fsstd" if you want standard installation. The path
   may slightly vary depending on the system:
   Caster-Executable:  /usr/sbin
   Startskripts:       /usr/bin
@@ -12,7 +14,7 @@ There are mainly two different installation types for this caster:
   Runtime test files: /var/run/ntripcaster
   Log files:          /var/log/ntripcaster
   Templates:          /usr/share/ntripcaster/templates
-- Run "./configure" install the software in one place. 
+- Run "autoreconf -fiv && ./configure" install the software in one place. 
   The default (again depends on the system) is "/usr/local/ntripcaster"
   but if you do not want the server to be installed in "/usr/local/ntripcaster" 
   specify the desired path with "./configure --prefix=<path>" 
