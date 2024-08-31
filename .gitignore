@@ -19,9 +19,9 @@ missing
 
 # Other
 ntripdaemon
-conf/clientmounts.aut
-conf/groups.aut
-conf/ntripcaster.conf
-conf/sourcemounts.aut
-conf/sourcetable.dat
-conf/users.aut
+/ntripcaster/conf/clientmounts.aut
+/ntripcaster/conf/groups.aut
+/ntripcaster/conf/ntripcaster.conf
+/ntripcaster/conf/sourcemounts.aut
+/ntripcaster/conf/sourcetable.dat
+/ntripcaster/conf/users.aut
