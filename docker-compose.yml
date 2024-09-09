@@ -1,12 +1,9 @@
-volumes:
-  ntripcaster-logs:
-
 services:
   ntripcaster:
     build: .
-    restart: unless-stopped
+    restart: always
     ports:
       - 2101:2101
     volumes:
-      - ./ntripcaster/conf:/usr/local/ntripcaster/conf
-      - ntripcaster-logs:/usr/local/ntripcaster/logs
+      - ./conf:/usr/local/ntripcaster/conf
+      - ./logs:/usr/local/ntripcaster/logs

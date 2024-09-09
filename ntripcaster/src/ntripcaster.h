@@ -127,6 +127,7 @@
 #define DEFAULT_CLIENT_MOUNT_FILE "clientmounts.aut"
 #define DEFAULT_SOURCE_MOUNT_FILE "sourcemounts.aut"
 #define DEFAULT_SOURCETABLE_FILE "sourcetable.dat"
+#define DEFAULT_BANLIST_FILE "banlist.conf"
 #define DEFAULT_STATUSTIME 120
 #define DEFAULT_LOCATION "Federal Agency of Cartography and Geodesy"
 #define DEFAULT_RP_EMAIL "euref-ip@bkg.bund.de"
@@ -141,6 +142,7 @@
 #define DEFAULT_OPERATOR "BKG"
 #define DEFAULT_OPERATOR_URL "https://www.bkg.bund.de/"
 #define DEFAULT_SESSION_TIMEOUT 300
+#define DEFAULT_HIDE_VERSION 0
 
 #define NTRIP_VERSION "2.0"
 #undef NTRIP_NUMBER

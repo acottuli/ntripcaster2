@@ -98,6 +98,7 @@
 #include "commands.h"
 #include "relay.h"
 #include "source.h"
+#include "authenticate/basic.h"
 
 #ifndef MSG_DONTWAIT
 #define MSG_DONTWAIT 0
@@ -456,7 +457,8 @@ void get_running_stats_proc (statistics_t *stat, int lock)
   stat->source_connections = info.total_stats.source_connections;
   stat->client_connect_time = info.total_stats.client_connect_time;
   stat->source_connect_time = info.total_stats.source_connect_time;
-
+  int banned_clients = get_banned_clients();
+  stat->banned = banned_clients / 4;
         /* These in bytes */
   get_current_stats_proc (&bufstat, lock);
   add_stats(stat, &bufstat, 0);
@@ -487,6 +489,7 @@ void zero_stats(statistics_t *stat)
   stat->source_connections = 0;
   stat->client_connect_time = 0;
   stat->source_connect_time = 0;
+  stat->banned = 0;
 }
 
 void add_stats(statistics_t *target, statistics_t *source, unsigned long int factor)

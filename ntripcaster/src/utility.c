@@ -973,6 +973,12 @@ print_startup_server_info ()
   if (info.server_name)
     write_log (LOG_DEFAULT, "Using '%s' as servername...", info.server_name);
 
+  if (info.hide_version) {
+    write_log (LOG_DEFAULT, "Hide version: Yes");
+  } else {
+    write_log (LOG_DEFAULT, "Hide version: No");
+  }
+
   write_log(LOG_DEFAULT, "Server limits: %d clients, %d clients per source, %d sources, %d admins",
       info.max_clients, info.max_clients_per_source, info.max_sources, info.max_admins);
 
@@ -2023,4 +2029,29 @@ int is_server_running(void)
 void set_server_running(int state)
 {
   running = state;
+}
+
+// Función para convertir una dirección IP en un entero de 32 bits
+uint32_t ip_to_int(const char *ip) {
+    uint32_t addr = 0;
+    int i;
+    for (i = 0; i < 4; i++) {
+        addr = addr << 8 | atoi(ip);
+        ip = strchr(ip, '.') + 1;
+    }
+    return addr;
+}
+
+// Función para comprobar si una IP pertenece a una red CIDR
+int is_in_network(const char *ip, const char *network) {
+    uint32_t ip_addr = ip_to_int(ip);
+    uint32_t net_addr, mask;
+
+    // Extraer la dirección de red y la máscara de la notación CIDR
+    sscanf(network, "%u/%u", &net_addr, &mask);
+
+    // Crear la máscara en forma de entero
+    mask = ~((1 << (32 - mask)) - 1);
+
+    return (ip_addr & mask) == (net_addr & mask);
 }

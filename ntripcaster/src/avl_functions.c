@@ -105,6 +105,19 @@ int compare_users (const void *first, const void *second, void *param)
   return (ntripcaster_strcmp (v1->name, v2->name));
 }
 
+int compare_bans (const void *first, const void *second, void *param)
+{
+  ntripcaster_ban_t *v1 = (ntripcaster_ban_t *) first, *v2 = (ntripcaster_ban_t *) second;
+
+  if (!first || !second || !v1->ip || !v2->ip)
+  {
+    xa_debug (2, "WARNING: compare_bans called with NULL pointers!");
+    return 0;
+  }
+
+  return (ntripcaster_strcmp (v1->ip, v2->ip));
+}
+
 int compare_mounts (const void *first, const void *second, void *param)
 {
   mount_t *v1 = (mount_t *) first, *v2 = (mount_t *) second;

@@ -1,3 +1,8 @@
+2.0.46 --> 2.0.47 (Jorge Toledo)
+*****************
+- Hide server version
+- Remove favicon
+- Block/Ban ip clients
 2.0.45 --> 2.0.46
 *****************
 - Extend prometheus statistics (https://software.rtcm-ntrip.org/ticket/183)

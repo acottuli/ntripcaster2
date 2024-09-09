@@ -674,7 +674,12 @@ login_as_client_on_server (connection_t *con, relay_t *rel)
   }
   if(rel->ntrip2)
     catsnprintf(buffer, BUFSIZE, "Ntrip-Version: Ntrip/2.0\r\n");
-  catsnprintf(buffer, BUFSIZE, "User-Agent: NTRIP BKG Caster/%s\r\nReferer: RELAY\r\nConnection: close\r\n", info.version);
+  /* Hide Server Version */
+  if (info.hide_version){
+    catsnprintf(buffer, BUFSIZE, "User-Agent: NTRIP Caster\r\nReferer: RELAY\r\nConnection: close\r\n");
+  } else{
+    catsnprintf(buffer, BUFSIZE, "User-Agent: NTRIP Caster/%s\r\nReferer: RELAY\r\nConnection: close\r\n", info.version);
+  }
   if (rel->userID != NULL) catsnprintf(buffer, BUFSIZE, "Authorization: Basic %s\r\n", rel->userID);
 
 #ifdef HAVE_TLS
@@ -729,7 +734,12 @@ login_as_client_on_server (connection_t *con, relay_t *rel)
     }
     var = get_con_variable(con, "Server");
     if(!var) {
-        snprintf(buffer, sizeof(buffer), "NTRIP BKG Caster/%s (relay)", info.version);
+        /* Hide Server Version */
+        if (info.hide_version){
+          snprintf(buffer, sizeof(buffer), "NTRIP Caster (relay)");
+        } else {
+          snprintf(buffer, sizeof(buffer), "NTRIP Caster/%s (relay)", info.version);
+        }
     }
     else {
         snprintf(buffer, sizeof(buffer), "%s (relay v2)", var);
@@ -746,7 +756,12 @@ login_as_client_on_server (connection_t *con, relay_t *rel)
   }
   else
   {
-    snprintf(buffer, sizeof(buffer), "NTRIP BKG Caster/%s (relay)", info.version);
+    /* Hide Server Version */
+    if (info.hide_version){
+      snprintf(buffer, sizeof(buffer), "NTRIP Caster (relay)");
+    } else{
+      snprintf(buffer, sizeof(buffer), "NTRIP Caster/%s (relay)", info.version);
+    }
     add_varpair2(con->headervars, nstrdup("Source-Agent"), nstrdup(buffer));
   }
 
@@ -757,8 +772,17 @@ int login_as_nontrip_client_on_server (connection_t *con, relay_t *rel) {
   SOCKET sockfd;
   char buffer[50];
   ntrip_request_t *req = &rel->req;
-
-  snprintf(buffer, sizeof(buffer), "NTRIP BKG Caster/%s (direct access)", info.version);
+  /* Hide Server Version */
+  if (info.hide_version)
+  {
+    strcpy(info.version, "*");
+  }
+  /* Hide Server Version */
+  if (info.hide_version){
+    snprintf(buffer, sizeof(buffer), "NTRIP Caster (direct access)");
+  } else{
+    snprintf(buffer, sizeof(buffer), "NTRIP Caster/%s (direct access)", info.version);
+  }
   add_varpair2(con->headervars, nstrdup("Source-Agent"), nstrdup(buffer));
 
   if ((sockfd = sock_connect_wto (req->host, req->port, 15)) == -1) {

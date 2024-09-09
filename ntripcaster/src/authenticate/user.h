@@ -39,14 +39,22 @@
  */
 
 void parse_user_authentication_file();
+void parse_ban_file();
 ntripcaster_user_t *create_user_from_line(char *line);
+ntripcaster_ban_t *create_ban_from_line(char *line);
 ntripcaster_user_t *create_user();
+ntripcaster_ban_t *create_ban();
 void add_authentication_user(ntripcaster_user_t * user);
+void add_ban_user(ntripcaster_ban_t * ban);
 usertree_t *create_user_tree();
+bantree_t *create_ban_tree();
 void free_user_tree(usertree_t * ut);
+void free_ban_tree(bantree_t * bt);
 int user_authenticate(char *cuser, const char *password);
+int ban_check(char *ip);
 ntripcaster_user_t *find_user_from_tree(usertree_t * ut, char *name);
 ntripcaster_user_t *con_get_user(connection_t * con);
 void con_display_users(com_request_t * req);
 void html_display_users(com_request_t *req);
 int runtime_add_user(char *name, char *password);
+int get_ban_count();

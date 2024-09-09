@@ -225,10 +225,20 @@ void ntrip_init() {
   snprintf(buf, 50, "Ntrip/%s", info.ntripversion);
   he = get_header_element(102);
   he->value = strdup(buf);
-  snprintf(buf, 50, "NTRIP BKG Caster/%s", info.version);
+  /* Hide Server Version */
+  if (info.hide_version){
+    snprintf(buf, 50, "NTRIP Caster");
+  } else{
+    snprintf(buf, 50, "NTRIP Caster/%s", info.version);
+  }
   he = get_header_element(103);
   he->value = strdup(buf);
-  snprintf(buf, 50, "NTRIP BKG Caster %s/%s", info.version, info.ntripversion);
+  /* Hide Server Version */
+  if (info.hide_version){
+    snprintf(buf, 50, "NTRIP Caster %s", info.ntripversion);
+  } else{
+    snprintf(buf, 50, "NTRIP Caster %s/%s", info.version, info.ntripversion);
+  }
   he = get_header_element(104);
   he->value = strdup(buf);
 }

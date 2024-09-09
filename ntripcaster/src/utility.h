@@ -133,6 +133,8 @@ int write_line_to_buffer(string_buffer_t *sb, char *string);
 
 int is_server_running(void);
 void set_server_running(int state);
+uint32_t ip_to_int(const char *ip);
+int is_in_network(const char *ip, const char *network);
 
 #ifndef _WIN32
 #define min(x,y) ((x)<(y)?(x):(y))

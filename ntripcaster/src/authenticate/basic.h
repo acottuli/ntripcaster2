@@ -39,6 +39,7 @@
  */
 
 typedef avl_tree usertree_t;
+typedef avl_tree bantree_t;
 typedef avl_tree grouptree_t;
 typedef avl_tree mounttree_t;
 
@@ -46,6 +47,10 @@ typedef struct userSt {
   char *name;
   char *pass;
 } ntripcaster_user_t;
+
+typedef struct banSt {
+  char *ip;
+} ntripcaster_ban_t;
 
 typedef struct groupSt {
   char *name;
@@ -71,3 +76,5 @@ mount_t *need_authentication_with_mutex(ntrip_request_t * req, mounttree_t *mt);
 int check_ip_restrictions(connection_t *con);
 int add_group_connection(connection_t *con);
 void remove_group_connection(connection_t *con);
+int is_client_banned (connection_t *con);
+int get_banned_clients();

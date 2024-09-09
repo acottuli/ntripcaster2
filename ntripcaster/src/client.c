@@ -142,6 +142,12 @@ void http_client_login(connection_t *con, ntrip_request_t *req) {
     return;
   }
 
+  if (is_client_banned(con)) {
+    write_http_ban (con);
+    kick_not_connected (con, "Access denied (client ip banned)");
+    return;
+  }
+
   if (info.throttle_on) {
     ntrip_write_message(con, HTTP_NOT_ACCEPTABLE, get_formatted_time(HEADER_TIME, time));
     kick_not_connected (con, "Bandwidth usage too high (throttling)");
@@ -213,10 +219,6 @@ void http_client_login(connection_t *con, ntrip_request_t *req) {
     if ((ntripcaster_strncmp(req->path, "/home", 5) == 0)) {
       http_display_home_page (con);
       kick_not_connected (con, "Home page displayed");
-      return;
-    } else if ((ntripcaster_strncmp(req->path, "/favicon.ico", 12) == 0)) {
-      http_get_favicon (con);
-      kick_not_connected (con, "Favicon delivered");
       return;
     } else if ((ntripcaster_strncmp(req->path, "/robots.txt", 11) == 0)) {
       http_get_robots (con);

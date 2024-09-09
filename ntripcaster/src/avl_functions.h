@@ -41,6 +41,7 @@
 
 int compare_groups (const void *first, const void *second, void *param);
 int compare_users (const void *first, const void *second, void *param);
+int compare_bans (const void *first, const void *second, void *param);
 int compare_mounts (const void *first, const void *second, void *param);
 int compare_restricts (const void *first, const void *second, void *param);
 int compare_statisticsentry (const void *first, const void *second, void *param);

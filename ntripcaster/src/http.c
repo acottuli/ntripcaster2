@@ -143,7 +143,6 @@ http_command_t http_commands[] =
   { (char *) NULL, (ntripcaster_int_function *) NULL, 0, (char *) NULL },
 };
 
-
 http_variable_t http_variables[] =
 {
   { "PORT", integer_e, &info.port[0] },
@@ -225,6 +224,23 @@ write_http_code_page (connection_t *con, int code, const char *msg)
   sock_write_line (con->sock, "<html><head><title>%d %s</title></head>%s", code, msg, DEFAULT_BODY_TAG);
   sock_write_line (con->sock, "%d %s", code, msg);
   sock_write_line (con->sock, "</body></html>");
+}
+
+void
+write_http_ban (connection_t *con)
+{
+  char template_file[BUFSIZE] = "ban.html";
+  char file_content[BUFSIZE];
+
+  write_http_header (con->sock, 403, "Forbidden");
+  sock_write_line (con->sock, "Connection: close");
+  sock_write_line (con->sock, "Content-Type: text/html\r\n");
+
+  if (get_ntripcaster_file (template_file, template_file_e, R_OK, file_content) != NULL)
+  {
+    write_template_parsed_html_page (con, NULL, file_content, -2, NULL);
+    return;
+  }
 }
 
 void
@@ -593,25 +609,6 @@ void write_file_raw(connection_t *con, const char *file)
 }
 
 void
-http_get_favicon (connection_t *con)
-{
-  char file[BUFSIZE];
-
-  if (get_ntripcaster_file ("favicon.ico", template_file_e, R_OK, file) != NULL)
-  {
-    write_http_header (con->sock, 200, "OK");
-    sock_write_line (con->sock, "Connection: close");
-    sock_write_line (con->sock, "Content-Type: image/x-icon\r\n");
-    write_file_raw (con, file);
-  } else {
-    write_http_header (con->sock, 404, "Not found");
-    sock_write_line (con->sock, "Connection: close");
-    sock_write_line (con->sock, "Content-Type: text/html\r\n");
-    sock_write_line (con->sock, "<html>No favicon found.<br></html>");
-  }
-}
-
-void
 http_get_robots (connection_t *con)
 {
   char file[BUFSIZE];
@@ -652,7 +649,12 @@ write_http_header(sock_t sockfd, int error, const char *msg)
   sock_write_line (sockfd, "HTTP/1.1 %i %s", error, msg);
   sock_write_line (sockfd, "Ntrip-Version: Ntrip/%s", NTRIP_VERSION);
   sock_write_line (sockfd, "Access-Control-Allow-Origin: *");
-  sock_write_line (sockfd, "Server: NTRIP BKG Caster/%s", VERSION);
+  /* Hide Server Version */
+  if (info.hide_version) {
+    sock_write_line (sockfd, "Server: NTRIP Caster");
+  } else {
+    sock_write_line (sockfd, "Server: NTRIP Caster/%s", VERSION);
+  }
 }
 
 int

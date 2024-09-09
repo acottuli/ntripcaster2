@@ -212,6 +212,7 @@ typedef struct statistics_St
   unsigned long int source_connections; /* Number of connects from sources */
   unsigned long int client_connect_time; /* Total sum of the time each client has been connected (minutes) */
   unsigned long int source_connect_time; /* Total sum of the time each source has been connected (minutes) */
+  unsigned long int banned; /* Total sum of the banned clients */
 } statistics_t;
 
 typedef struct statisticsentry_St
@@ -434,6 +435,7 @@ typedef struct {
   char *prompt;
 
   char *sourcetablefile; // name of sourcetable file.
+  char *banlistfile; // name of banlist file.
 
   /* Logfiles */
   char *logfilename;  /* Name of default log file */
@@ -540,6 +542,7 @@ typedef struct {
   int policy;
   int allow_http_admin;
   int sourcetable_via_udp; /* send sourcetable via UDP, IMPORTANT: can be used for DDOS UDP amplification */
+  int hide_version;
 
   /* Statistics */
   statistics_t hourly_stats;

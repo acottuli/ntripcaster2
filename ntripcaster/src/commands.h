@@ -202,6 +202,7 @@ char *settings_generator (char *text, int state);
 #define ADMIN_SHOW_STATS_SOURCE_ALTF 216
 #define ADMIN_SHOW_STATS_END 217
 #define ADMIN_SHOW_STATS_TIME 218
+#define ADMIN_SHOW_STATS_NUMBAN 219
 
 /* com_resync() */
 #define ADMIN_SHOW_RESYNC 230

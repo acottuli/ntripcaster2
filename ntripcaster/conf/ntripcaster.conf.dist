@@ -67,6 +67,7 @@ port 2101
 # functionality.
 
 #relay pull -i user1:pass1 -m /TITZ0 129.217.182.51:2101/TITZ0
+#relay_reconnect_time 5
 
 ################################# Sourcetable #################################
 # The name of the sourcetable file
@@ -138,3 +139,9 @@ acl_policy 1
 # could be used for UDP-based amplification attack to do D(DOS) on other
 # servers when enabled and not properly mitigated
 sourcetable_via_udp 0
+# hide version of caster (1 = yes, 0 = no [default])
+#hide_version 0
+################################# Banlist #################################
+# The name of the banlist file
+
+banlistfile banlist.conf

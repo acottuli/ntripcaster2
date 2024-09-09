@@ -99,6 +99,7 @@ mutex_t authentication_mutex = {MUTEX_STATE_UNINIT};
 mounttree_t *client_mounttree = NULL;
 mounttree_t *source_mounttree = NULL;
 usertree_t *usertree = NULL;
+bantree_t *bantree = NULL;
 grouptree_t *grouptree = NULL;
 time_t lastrehash = 0;
 
@@ -124,6 +125,12 @@ void rehash_authentication_scheme()
         rehash_it = 1;
     }
   if (!rehash_it && (get_ntripcaster_file(info.source_mountfile, conf_file_e, R_OK, file) != NULL))
+    if (stat(file, &st) == 0) {
+      if (st.st_mtime > lastrehash)
+        rehash_it = 1;
+    }
+
+  if (!rehash_it && (get_ntripcaster_file(info.banlistfile, conf_file_e, R_OK, file) != NULL))
     if (stat(file, &st) == 0) {
       if (st.st_mtime > lastrehash)
         rehash_it = 1;
@@ -159,6 +166,11 @@ void parse_authentication_scheme() {
   parse_user_authentication_file();
 
   /*
+   * Parse ban file and flip it into memory
+   */
+  parse_ban_file();
+
+  /*
    * Dito with group file, with pointers to every user
    */
   parse_group_authentication_file();
@@ -181,6 +193,7 @@ void destroy_authentication_scheme() {
   source_mounttree = create_mount_tree();
   grouptree = create_group_tree();
   usertree = create_user_tree();
+  bantree = create_ban_tree();
 }
 
 void cleanup_authentication_scheme() {
@@ -188,6 +201,7 @@ void cleanup_authentication_scheme() {
   free_mount_tree(source_mounttree);
   free_group_tree(grouptree);
   free_user_tree(usertree);
+  free_ban_tree(bantree);
 }
 
 int authenticate_user_request(connection_t *con, ntrip_request_t *req, contype_t contype) {
@@ -246,8 +260,7 @@ int authenticate_user_request(connection_t *con, ntrip_request_t *req, contype_t
   mount ? mount->name : "<none>", ret, req->path);
 
   if(strncmp(req->path, "/admin", 6) && strncmp(req->path, "/oper", 5)
-  && strncmp(req->path, "/home", 5) && strncmp(req->path, "/favicon.ico", 12)
-  && strncmp(req->path, "/robots.txt", 11)
+  && strncmp(req->path, "/home", 5) && strncmp(req->path, "/robots.txt", 11)
   && strcmp(req->path, "all") && strcmp(req->path, "default")) {
     ntrip_request_t r;
     if(!mount) {
@@ -457,7 +470,21 @@ add_group_connection(connection_t *con) {
   return ret;
 }
 
+/* 1 for "banned, 0 for "allowed" */
+int
+is_client_banned (connection_t *con)
+{
+  int result = 0;
+  result = ban_check(con_host(con));
+  return result;
+}
+
 void
 remove_group_connection(connection_t *con) {
   con->groupactive = 0;
+}
+
+int 
+get_banned_clients (){
+  return get_ban_count();
 }

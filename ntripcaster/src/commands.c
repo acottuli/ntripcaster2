@@ -195,7 +195,7 @@ comp_element commands[] =
 /* All the settings for the remote admin */
 set_element admin_settings[] =
 {
-//  { "encoder_password", string_e,  "The encoder password", NULL },
+  { "encoder_password", string_e,  "The encoder password", NULL },
   { "admin_password", string_e, "The remote admin password", NULL },
   { "oper_password", string_e, "Operator Password", NULL },
   { "client_timeout", integer_e, "When to kick out clients", NULL },
@@ -215,6 +215,7 @@ set_element admin_settings[] =
 //  { "logfiledebuglevel", integer_e, "Debug level for logfile output", NULL},
 //  { "consoledebuglevel", integer_e, "Debug level for console output", NULL},
   { "server_url", string_e, "URL for this Ntrip Caster server", NULL},
+  { "hide_version", integer_e, "Hide server version", NULL},
 //  { "logfile", string_e, "Main logfile", NULL},
 //  { "accessfilename", string_e, "Access logfilename", NULL},
 //  { "usagefilename", string_e, "Usage logfilename", NULL},
@@ -236,7 +237,7 @@ setup_admin_settings ()
 {
   int x = 0;
   /* The order of these are IMPORTANT */
-//  admin_settings[x++].setting = &info.encoder_pass;
+  admin_settings[x++].setting = &info.encoder_pass;
   admin_settings[x++].setting = &info.remote_admin_pass;
   admin_settings[x++].setting = &info.oper_pass;
   admin_settings[x++].setting = &info.client_timeout;
@@ -256,6 +257,7 @@ setup_admin_settings ()
 //  admin_settings[x++].setting = &info.logfiledebuglevel;
 //  admin_settings[x++].setting = &info.consoledebuglevel;
   admin_settings[x++].setting = &info.url;
+  admin_settings[x++].setting = &info.hide_version;
 //  admin_settings[x++].setting = &info.logfilename;
 //  admin_settings[x++].setting = &info.accessfilename;
 //  admin_settings[x++].setting = &info.usagefilename;
@@ -318,6 +320,7 @@ set_element configfile_settings[] =
   { "operator", string_e, "Who operates the server", NULL},
   { "operator_url", string_e, "Where you find informations about the NTRIP operator", NULL},
   { "sourcetablefile", string_e, "Sourcetable file", NULL},
+  { "banlistfile", string_e, "Banlistfile file", NULL},
 #ifdef HAVE_LIBLDAP
   { "ldap_server", string_e, "LDAP server name for authentication", NULL},
   { "ldap_uid_prefix", string_e, "LDAP user ID prefix for authentication", NULL},
@@ -327,6 +330,7 @@ set_element configfile_settings[] =
   { "encrypt_passwords", string_e, "Encrypt base parameter for password encryption", NULL },
 #endif /* USE_CRYPT */
   { "sourcetable_via_udp", integer_e, "Send Sourcetable via UDP (1) or default not (0)", NULL },
+  { "hide_version", integer_e, "Hide version of caster (1) or default not (0)", NULL },
   { (char *) NULL, 0, (char *) NULL, NULL }
 };
 
@@ -422,6 +426,7 @@ setup_config_file_settings()
   configfile_settings[x++].setting = &info.operator;
   configfile_settings[x++].setting = &info.operatorurl;
   configfile_settings[x++].setting = &info.sourcetablefile;
+  configfile_settings[x++].setting = &info.banlistfile;
 #ifdef HAVE_LIBLDAP
   configfile_settings[x++].setting = &info.ldap_server;
   configfile_settings[x++].setting = &info.ldap_uid_prefix;
@@ -431,6 +436,7 @@ setup_config_file_settings()
   configfile_settings[x++].setting = &info.encrypt_passwords;
 #endif /* USE_CRYPT */
   configfile_settings[x++].setting = &info.sourcetable_via_udp;
+  configfile_settings[x++].setting = &info.hide_version;
 }
 
 set_element *
@@ -1381,6 +1387,7 @@ com_stats (com_request_t *req)
   admin_write_line (req, ADMIN_SHOW_STATS_NUMADMINS, "Admins: %d", info.num_admins);
   admin_write_line (req, ADMIN_SHOW_STATS_NUMSOURCES, "Sources: %d", info.num_sources);
   admin_write_line (req, ADMIN_SHOW_STATS_NUMLISTENERS, "Listeners: %d", info.num_clients);
+  admin_write_line (req, ADMIN_SHOW_STATS_NUMBAN, "Banned Clients: %d", stat.banned);
 
   admin_write_line (req, ADMIN_SHOW_STATS_MISC, "Displaying server statistics since last resync at: %s", realstarttime);
   admin_write_line (req, ADMIN_SHOW_STATS_READ, "Total KBytes read: %lu", stat.read_kilos);

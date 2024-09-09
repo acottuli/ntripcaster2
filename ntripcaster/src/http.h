@@ -64,7 +64,6 @@ typedef struct
 int http_admin_command (connection_t *con, ntrip_request_t *req);
 void display_admin_page (connection_t *con, ntrip_request_t *req);
 void http_display_home_page (connection_t *con);
-void http_get_favicon (connection_t *con);
 void http_get_robots (connection_t *con);
 void write_http_header (sock_t sockfd, int error, const char *msg);
 http_parsable_t *find_http_element (char *name, http_parsable_t *el);
@@ -80,6 +79,7 @@ char *ntripcaster_uptime ();
 char *ntripcaster_starttime ();
 const void *get_http_variable (vartree_t *request_vars, const char *name);
 void write_http_code_page (connection_t *con, int code, const char *msg);
+void write_http_ban (connection_t *con);
 void write_401 (connection_t *con, char *realm);
 void write_didnt_find_html_page (connection_t *con, char *file);
 void display_generic_admin_page (connection_t *con);

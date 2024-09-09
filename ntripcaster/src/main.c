@@ -571,7 +571,7 @@ void setup_defaults() {
 //  info.sourcetableutdfile = nstrdup(pathandfile);
 //  get_ntripcaster_file ("sourcetable.dat.xxx", var_file_e, R_OK, pathandfile);
 //  info.sourcetablexxxfile = nstrdup(pathandfile);
-
+  info.banlistfile = nstrdup(DEFAULT_BANLIST_FILE);
   info.accessfilename = nstrdup(DEFAULT_ACCESS_FILENAME);
   info.accessfile = -1;
 
@@ -597,6 +597,7 @@ void setup_defaults() {
   info.url = nstrdup(DEFAULT_URL);
 
   info.session_timeout = DEFAULT_SESSION_TIMEOUT;
+  info.hide_version = DEFAULT_HIDE_VERSION;
 
 #ifdef HAVE_LIBLDAP
   info.ldap_server = nstrdup(NC_LDAP_HOST);

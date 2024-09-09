@@ -101,6 +101,8 @@ extern mutex_t authentication_mutex;
 //extern mounttree_t *source_mounttree;
 extern usertree_t *usertree;
 extern grouptree_t *grouptree;
+extern bantree_t *bantree;
+int *banned_clients;
 
 void parse_user_authentication_file()
 {
@@ -131,6 +133,35 @@ void parse_user_authentication_file()
 
 //  if (userfile)
 //    nfree(userfile);
+  fd_close(fd);
+}
+
+void parse_ban_file()
+{
+  int fd;
+  ntripcaster_ban_t *ban;
+  char line[BUFSIZE];
+  char banlistfile[BUFSIZE];
+  banned_clients = 0;
+
+  if ((get_ntripcaster_file(info.banlistfile, conf_file_e, R_OK, banlistfile) == NULL) || ((fd = open_for_reading(banlistfile)) == -1)) {
+    xa_debug(1, "WARNING: Could not open banlistfile file");
+    return;
+  }
+  while (fd_read_line(fd, line, BUFSIZE)) {
+    if (line[0] == '#' || line[0] == ' ')
+      continue;
+
+    ban = create_ban_from_line(line);
+
+    if (ban)
+      add_ban_user(ban);
+  }
+
+  if (line[BUFSIZE-1] == '\0') {
+    write_log(LOG_DEFAULT, "READ ERROR: too long line in banlistfile file (exceeding BUFSIZE)");
+  }
+
   fd_close(fd);
 }
 
@@ -194,6 +225,24 @@ create_user_from_line(char *line)
   return user;
 }
 
+ntripcaster_ban_t *
+create_ban_from_line(char *line)
+{
+  ntripcaster_ban_t *ban;
+  char ip[BUFSIZE];
+
+  if (!line) {
+    xa_debug(1, "WARNING: create_ban_from_line() called with NULL pointer");
+    return NULL;
+  }
+  strcpy(ip, line);
+
+  ban = create_ban();
+  ban->ip = nstrdup(clean_string(ip));
+
+  return ban;
+}
+
 ntripcaster_user_t *
 create_user()
 {
@@ -204,6 +253,15 @@ create_user()
   return user;
 }
 
+ntripcaster_ban_t *
+create_ban()
+{
+  ntripcaster_ban_t *ban = (ntripcaster_ban_t *) nmalloc(sizeof (ntripcaster_ban_t));
+
+  ban->ip = NULL;
+  return ban;
+}
+
 usertree_t *
  create_user_tree()
 {
@@ -212,11 +270,25 @@ usertree_t *
   return ut;
 }
 
+bantree_t *
+ create_ban_tree()
+{
+  bantree_t *bt = avl_create(compare_bans, &info);
+
+  return bt;
+}
+
 static void freeuser(ntripcaster_user_t *user, void *param)
 {
   nfree(user->name);
   nfree(user->pass);
   nfree(user);
+}
+
+static void freeban(ntripcaster_ban_t *ban, void *param)
+{
+  nfree(ban->ip);
+  nfree(ban);
 }
 
 void add_authentication_user(ntripcaster_user_t * user)
@@ -236,10 +308,35 @@ void add_authentication_user(ntripcaster_user_t * user)
   xa_debug(1, "DEBUG: add_authentication_user(): Inserted user [%s:%s]", user->name, user->pass);
 }
 
+void add_ban_user(ntripcaster_ban_t * ban)
+{
+  ntripcaster_ban_t *out;
+
+  if (!ban || !bantree || !ban->ip) {
+    xa_debug(1, "ERROR: add_ban_user() called with NULL pointers");
+    return;
+  }
+  out = avl_replace(bantree, ban);
+
+  if (out) {
+    write_log(LOG_DEFAULT, "WARNING: Duplicate ban list record %s, using latter", ban->ip);
+    freeban(out, 0);
+  } else {
+    banned_clients = banned_clients + 1;
+    xa_debug(1, "DEBUG: add_ban_user(): Inserted banned user [%s]", ban->ip);
+  }
+}
+
 void free_user_tree(usertree_t * ut)
 {
   if (ut)
     avl_destroy(ut, (avl_node_func)freeuser);
+}
+
+void free_ban_tree(bantree_t * bt)
+{
+  if (bt)
+    avl_destroy(bt, (avl_node_func)freeban);
 }
 
 int user_authenticate(char *cuser, const char *password)
@@ -265,6 +362,28 @@ int user_authenticate(char *cuser, const char *password)
   if (!user) return 0;
 
   return password_match(user->pass, password);
+}
+
+int ban_check(char *ip)
+{
+  const ntripcaster_ban_t *banned;
+  ntripcaster_ban_t search;
+
+  if (!ip)
+  {
+    xa_debug(1, "WARNING: ban_check() called with NULL pointer");
+    return 0;
+  }
+
+  search.ip = ip;
+  banned = avl_find(bantree, &search);
+
+  if (banned){
+    return 1;
+  } else
+  {
+    return 0;
+  }
 }
 
 ntripcaster_user_t * find_user_from_tree(usertree_t * ut, char *name) {
@@ -356,6 +475,11 @@ void con_display_users(com_request_t * req)
   thread_mutex_unlock(&authentication_mutex);
 
   admin_write_line(req, ADMIN_SHOW_AUTH_USER_END, "End of user listing (%d listed)", listed);
+}
+
+int
+get_ban_count (){
+  return banned_clients;
 }
 
 /*void
